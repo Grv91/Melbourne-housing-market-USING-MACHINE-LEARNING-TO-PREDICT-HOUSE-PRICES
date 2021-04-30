@@ -1,0 +1,84 @@
+ Executive Summary
+Answering the business problem required identification of a robust dataset, this was found on Kaggle* and pertained to the Melbourne housing market.
+* https://www.kaggle.com/anthonypino/melbourne-housing-market
+
+Rationale:
+•	Multiple and recent years of selling data (2016, 17 & 18) which, through initial data exploration, enabled a general understanding of Melbourne’s housing market and its evolution over the study period. 
+•	34,857 observations and 21 relevant features.
+•	Features including type of property, number of rooms, number of cars, distance from city center, size of building and year built which would not only allow for price prediction but might also identify potential regions within the city with unique profiles and demonstrate the regions which experience the highest property value increase year to year.
+•	Features containing numerical values and string data.
+•	Data with missing values (including sales price which was removed from the dataset initially but when the model was completed, was used to predict the prices retrospectively)
+
+Data hygiene and preliminary exploration:
+
+•	Duplicate rows management – there were multiple duplicate rows in the dataset. Some of these may be due to multiple sales of the same property within the study period. After discussion it was decided to remove these, as although they had value and raised some interesting points to consider; such as number of listings, lowest price etc., this was not the focus of the study. Therefore, all duplicates were removed by sorting all the data in order of address, then date, and then removing the duplicates and retaining only those with the most recent sales date
+•	Missing target variable values handling – as the price is the target feature in the model, any missing price values were identified. As these made up far less than 30% of the data, these rows were removed on the understanding that this still left over 70% of the data to work with which was considered robust.  These were later used, once the model had been tested, to predict the missing prices.
+•	Numerical and string data types were identified in the dataset
+•	Missing features values management (1) – of the 21 features, 13 contained missing values. Some of these were more consequential than others. On examining the dataset, it was found that some missing values were highly correlated with ‘Land Size’ e.g. if ‘Land Size’ was blank, many other fields were also missing. As this data totaled far less than 30% of the overall data, it was decided to remove all observations where ‘Land Size’ was missing.   
+•	Missing features values management (2) – Where ‘Building Area’ was blank, it was decided to calculate the ratio of ‘Land Size’ to ‘Building Area’ and use that to impute missing values. 
+•	Missing features values management (3) – the ‘Year Built’ feature had some missing values and as there is no sensible method to impute this, it was decided to remove the observations where this was the case. Again, it did not contravene the 30% convention that had previously been determined.
+•	Missing features values management (4) – where the value for the ‘Car’ feature was missing, it was decided to impute this by calculating the mode value for this variable.  The rationale for keeping these observations rather than discarding, was that this related to parking ability or garage size and this, intuitively, would be an important contributor to house value.
+•	Missing features values management (5) – the final missing values related to latitude and longitude and it was decided that these values were not important given the other locational information that the dataset contained. Therefore, these observations were left in with the blanks untreated.
+•	Creating numerical values for categorical data – 6 of the features needed their content to be translated into a numerical value. These were Suburb, Type of Property, Method of Sale, Post Code, Council Area and Region Name.
+•	Data exploration – Once the above steps were completed, visualizations including pair plots were generated using seaborn to check correlations and the statistical significance of all the variables. This did not yield any meaningful results.
+•	Skewed values – log of price was utilized rather than real price as it was established through visualization techniques that real price was positively skewed.
+•	Train, Test & Validate – the data was then broken into 3 parts in preparation for modeling. The training data was then visualized as a histogram. This demonstrated a skewed left distribution which was then normalized using a logarithmic transformation. The transformation was undertaken to reduce variation caused by outliers in the dataset which can be troublesome in regression analysis.
+•	Correlations to identify exclusions – a heat map was created to visualize the correlations between the variables. This demonstrated multiple correlations, so it was decided to create 3 classifications for the features; internal, external and other. Internal relates specifically to the property itself in terms of number of rooms, type, land size and area. External included the location with features such as distance and post code etc., and other contains the year built, sales date and sales method. This then allowed highly correlated features within each classification to be excluded, so the model is not too sensitive to the test data. Ultimately, variables with more than a 0.20 correlation with the price and less than a 0.50 correlation with each other were retained. 
+
+
+Modeling:
+
+Tried 2 different models; Linear Regression and Random Forest. 
+
+Linear Regression Model:
+•	Defined the feature variables that were used to test (x-train) and the dependent variable (y-train)
+•	Used NumPy to convert values to floats and change the data into an array for the algorithm
+•	Imported Linear Reg model (SKLearn)
+•	Defined ’regressor’ to train the algorithm
+•	Produced a score on the validation set of 0.69452
+
+Random Forest Model:
+•	Used x-train and y-train as defined above
+•	Loaded the packages for Random Forest
+•	Defined ‘estimator’ to train the algorithm
+•	Produced a score on the validation set of 0.83960
+•	Chose this as the prediction model to be utilized 
+•	Ranked the features used to predict, in order of importance to the model
+•	Converted the estimator prediction prices from exp to log and loaded into a pandas data frame to test
+
+Prediction:
+•	Used dataset with missing price values (excluded earlier)
+•	Identified other missing features, on examination most of these were highly correlated with ‘Building Area’ and so those with a missing value for ‘Building Area’ were excluded. Also removed those with missing values for ‘Year Built’ and ‘Car’ (very small numbers).
+•	Transformed categorical values into numerical values (as before)
+•	Ran the model on the dataset, determined the accuracy of the model is 84% and the error rate is 16% 
+
+
+Conclusion:
+•	Analyzed Melbourne housing data using initial dataset of ~35,000 rows and 21 relevant features
+•	Performed rigorous data cleaning process
+•	Identified key features: 
+o	1. Rooms (0.232636)
+o	2. Type_code (0.220884)
+o	3. Distance (0.191189)
+o	4. Postcode_code (0.136837)
+o	5. Bathroom (0.094884)
+o	6. Car (0.076039)
+o	7. BuildingArea (0.032444)
+o	8. YearBuilt_code (0.015088)
+
+•	Created two models
+o	Linear regression achieved a score of 0.69452
+o	Random Forest achieved a score of 0.83960
+	Resulted in an average error of 15.7% on the testing data
+
+
+
+
+
+
+
+
+
+
+
+
